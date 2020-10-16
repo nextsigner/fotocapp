@@ -16,7 +16,7 @@ Item {
         //unik.sqliteInit(r.url)
         let sql='select * from nombres'
         let rows=unik.getSqlData(sql)
-        let a=['Seleccionar']
+        let a=['Seleccionar Nombre']
         for(var i=0;i<rows.length;i++){
             a.push(rows[i].col[1])
         }

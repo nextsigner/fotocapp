@@ -4,8 +4,10 @@ XArea {
     id: r
     width: xApp.width
     height: xApp.height
+    property int fontSize: app.fs*2
     onVisibleChanged: {
         if(visible){
+            tiAdministrador.text=apps.cAdmin
             tiFotografo.text=apps.cFotografo
             tiFotografoTel.text=apps.cFotografoTel
             tiFotografoEMail.text=apps.cFotografoEMail
@@ -31,21 +33,50 @@ XArea {
             anchors.horizontalCenter: parent.horizontalCenter
         }
         Text {
-            text: '<b>Fotografo</b>'
+            text: '<b>Datos para enviar</b>'
             font.pixelSize: app.fs*2
         }
         Row{
             id: rowTec
             spacing: app.fs
             Text {
+                id: labelAdmin
+                text: 'Administrador: *'
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: r.fontSize
+            }
+            Rectangle{
+                id: xtiAdministrador
+                width: r.width-labelAdmin.contentWidth-app.fs*2
+                height: r.fontSize*2
+                border.width: 2
+                clip: true
+                anchors.verticalCenter: parent.verticalCenter
+                TextInput{
+                    id: tiAdministrador
+                    width: parent.width-app.fs*0.5
+                    height: parent.height-app.fs
+                    font.pixelSize: r.fontSize
+                    anchors.centerIn: parent
+                    KeyNavigation.tab: tiFotografo
+                    Keys.onReturnPressed: tiFotografo.focus=true
+                    //onTextChanged: xListProdSearch.clear()
+                }
+            }
+        }
+        Row{
+            id: rowAdmin
+            spacing: app.fs
+            Text {
                 id: labelTec
                 text: 'Nombre: *'
                 anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: r.fontSize
             }
             Rectangle{
                 id: xtiFotografo
                 width: r.width-labelTec.contentWidth-app.fs*2
-                height: app.fs*2
+                height: r.fontSize*2
                 border.width: 2
                 clip: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -53,7 +84,7 @@ XArea {
                     id: tiFotografo
                     width: parent.width-app.fs*0.5
                     height: parent.height-app.fs
-                    font.pixelSize: app.fs
+                    font.pixelSize: r.fontSize
                     anchors.centerIn: parent
                     KeyNavigation.tab: tiFotografoTel
                     Keys.onReturnPressed: tiFotografoTel.focus=true
@@ -68,11 +99,12 @@ XArea {
                 id: labelTecTel
                 text: 'Teléfono: *'
                 anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: r.fontSize
             }
             Rectangle{
                 id: xtiFotografoTel
-                width: r.width-labelTec.contentWidth-app.fs*2
-                height: app.fs*2
+                width: r.width-labelTecTel.contentWidth-app.fs*2
+                height: r.fontSize*2
                 border.width: 2
                 clip: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -80,7 +112,7 @@ XArea {
                     id: tiFotografoTel
                     width: parent.width-app.fs*0.5
                     height: parent.height-app.fs
-                    font.pixelSize: app.fs
+                    font.pixelSize: r.fontSize
                     anchors.centerIn: parent
                     KeyNavigation.tab: tiFotografoEMail
                     Keys.onReturnPressed: tiFotografoEMail.focus=true
@@ -95,11 +127,12 @@ XArea {
                 id: labelTecEMail
                 text: 'E-Mail: *'
                 anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: r.fontSize
             }
             Rectangle{
                 id: xtiFotografoEMail
-                width: r.width-labelTec.contentWidth-app.fs*2
-                height: app.fs*2
+                width: r.width-labelTecEMail.contentWidth-app.fs*2
+                height: r.fontSize*2
                 border.width: 2
                 clip: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -107,7 +140,7 @@ XArea {
                     id: tiFotografoEMail
                     width: parent.width-app.fs*0.5
                     height: parent.height-app.fs
-                    font.pixelSize: app.fs
+                    font.pixelSize: r.fontSize
                     anchors.centerIn: parent
                     validator: RegExpValidator{regExp: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/}
                     KeyNavigation.tab: btnSetConfigData
@@ -121,26 +154,40 @@ XArea {
             width: r.width-app.fs*2
             wrapMode: Text.WordWrap
             //anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: app.fs
+            font.pixelSize: r.fontSize
         }
-        Boton{
-            id: btnSetConfigData
-            text: focus?'<b>Listo</b>':'Listo'
-            fontSize: app.fs
+        Row{
+            spacing: app.fs
             anchors.horizontalCenter: parent.horizontalCenter
-            KeyNavigation.tab: tiFotografo
-            onClicked: {
-                tiFotografo.focus=false
-                tiFotografoTel.focus=false
-                tiFotografoEMail.focus=false
-                if(tiFotografo.text!==''&&tiFotografoTel.text!==''&&tiFotografoEMail.text!==''){
-                    apps.cFotografo=tiFotografo.text
-                    apps.cFotografoTel=tiFotografoTel.text
-                    apps.cFotografoEMail=tiFotografoEMail.text
-                    xAcceso.visible=true
+            Boton{
+                id: btnCancelConfigData
+                text: focus?'<b>Cancelar</b>':'Cancelar'
+                fontSize: r.fontSize
+                KeyNavigation.tab: tiFotografo
+                onClicked: {
                     app.mod=0
-                }else{
-                    labelStatusTecConfig.text='Para utilizar esta aplicación hay que llenar todos los campos de este formulario.'
+                }
+            }
+            Boton{
+                id: btnSetConfigData
+                text: focus?'<b>Listo</b>':'Listo'
+                fontSize: r.fontSize
+                KeyNavigation.tab: tiFotografo
+                onClicked: {
+                    tiAdministrador.focus=false
+                    tiFotografo.focus=false
+                    tiFotografoTel.focus=false
+                    tiFotografoEMail.focus=false
+                    if(tiFotografo.text!==''&&tiFotografoTel.text!==''&&tiFotografoEMail.text!==''){
+                        apps.cAdmin=tiAdministrador.text
+                        apps.cFotografoNom=tiFotografo.text
+                        apps.cFotografoTel=tiFotografoTel.text
+                        apps.cFotografoEMail=tiFotografoEMail.text
+                        xAcceso.visible=true
+                        app.mod=0
+                    }else{
+                        labelStatusTecConfig.text='Para utilizar esta aplicación hay que llenar todos los campos de este formulario.'
+                    }
                 }
             }
         }
@@ -165,12 +212,12 @@ XArea {
             spacing: app.fs
             Text {
                 text: '<b>Ingresar Clave</b>'
-                font.pixelSize: app.fs*2
+                font.pixelSize: r.fontSize
                 anchors.horizontalCenter: parent.horizontalCenter
             }
             Text {
-                text:  'Solicitar clave de acceso a pizarromario@gmail.com'
-                font.pixelSize: app.fs
+                text:  'Solicitar clave de acceso a nextsigner@gmail.com'
+                font.pixelSize: r.fontSize
                 width: r.width-app.fs*2
                 wrapMode: Text.WordWrap
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -181,12 +228,13 @@ XArea {
                 Text {
                     id: labelClaveAcc
                     text: 'Clave:'
+                    font.pixelSize: r.fontSize
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Rectangle{
                     id: xTiClaveAcc
-                    width: r.width-labelHost.contentWidth-app.fs*2
-                    height: app.fs*2
+                    width: r.width-labelClaveAcc.contentWidth-app.fs*2
+                    height: r.fontSize*2
                     border.width: 2
                     clip: true
                     anchors.verticalCenter: parent.verticalCenter
@@ -194,7 +242,7 @@ XArea {
                         id: tiClaveAcc
                         width: parent.width-app.fs*0.5
                         height: parent.height-app.fs
-                        font.pixelSize: app.fs
+                        font.pixelSize: r.fontSize
                         anchors.centerIn: parent
                         echoMode: TextInput.Password
                         Keys.onReturnPressed: xAcceso.acceder()
@@ -206,15 +254,27 @@ XArea {
                 id: labelStatusAcc
                 width: r.width-app.fs*2
                 wrapMode: Text.WordWrap
-                font.pixelSize: app.fs
+                font.pixelSize: r.fontSize
                 anchors.horizontalCenter: parent.horizontalCenter
             }
-            Boton{
-                text: 'Acceder'
-                fontSize: app.fs
+            Row{
+                spacing: app.fs
                 anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    xAcceso.acceder()
+                Boton{
+                    id: btnCancelAcceso
+                    text: focus?'<b>Cancelar</b>':'Cancelar'
+                    fontSize: r.fontSize
+                    KeyNavigation.tab: tiFotografo
+                    onClicked: {
+                        app.mod=0
+                    }
+                }
+                Boton{
+                    text: 'Acceder'
+                    fontSize: r.fontSize
+                    onClicked: {
+                        xAcceso.acceder()
+                    }
                 }
             }
         }

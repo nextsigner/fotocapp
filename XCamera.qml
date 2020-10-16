@@ -183,11 +183,27 @@ XArea {
             Boton{
                 text: 'Capturar'
                 fontSize: app.fs*2
-                enabled: cbNombres.currentIndex!==0
+                opacity: cbNombres.currentIndex===0?0.5:1.0
                 onClicked: {
-                    if(cbNombres.currentIndex===0){
+                    if(apps.cAdmin===''){
+                        let msg='Para utilizar esta aplicación hay que anotar el nombre de la empresa que recibirá las capturas. \nPara hacer esto hay que ir al menú Configurar y poner los datos del fotografo.'
+                        let comp=Qt.createComponent("XMsgBox.qml")
+                        let obj=comp.createObject(r, {text:msg})
                         return
                     }
+                    if(apps.cFotografoNom===''){
+                        let msg='Para utilizar esta aplicación hay que anotar el nombre del fotógrafo. \nPara hacer esto hay que ir al menú Configurar y poner los datos del fotografo.'
+                        let comp=Qt.createComponent("XMsgBox.qml")
+                        let obj=comp.createObject(r, {text:msg})
+                        return
+                    }
+                    if(cbNombres.currentIndex===0){
+                        let msg='Para realizar una captura primero hay que elegir un nombre.'
+                        let comp=Qt.createComponent("XMsgBox.qml")
+                        let obj=comp.createObject(r, {text:msg})
+                        return
+                    }
+                    xInfoCap.fotografo=apps.cFotografoNom
                     xInfoCap.fotode=cbNombres.currentText
                     flash.opacity=1.0
                 }
