@@ -43,8 +43,8 @@ ApplicationWindow {
         id: apps
         fileName: moduleName+'.cfg'
         property bool localHost: true
-        property string cAdmin: 'null'
-        property string cFotografoNom: 'anónimo'
+        property string cAdmin: ''
+        property string cFotografoNom: ''
         property string cFotografoEMail: ''
         property string cFotografoTel: ''
         onLocalHostChanged: {
@@ -52,6 +52,7 @@ ApplicationWindow {
         }
     }
 
+    ManSqliteData{id: manSqlData}
     Item{
         id: xApp
         anchors.fill: parent
@@ -114,6 +115,13 @@ ApplicationWindow {
                 XConfig{id: xConfig;visible: app.mod===1}
                 XAbout{id: xAbout;visible: app.mod===2}
 
+            }
+        }
+        XAddNom{
+            id: xAddNom;
+            visible: false
+            onVisibleChanged: {
+                if(!visible)xCamera.cbNoms.model=manSqlData.getNombres()
             }
         }
         XLoading{id: xLoading}

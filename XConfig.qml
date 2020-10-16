@@ -9,8 +9,7 @@ XArea {
             tiFotografo.text=apps.cFotografo
             tiFotografoTel.text=apps.cFotografoTel
             tiFotografoEMail.text=apps.cFotografoEMail
-            tiHost.text=apps.serverUrl
-            tiHost.focus=true
+            tiFotografo.focus=true
         }
     }
     Rectangle{
@@ -31,46 +30,8 @@ XArea {
             font.pixelSize: app.fs*2
             anchors.horizontalCenter: parent.horizontalCenter
         }
-        Row{
-            id: rowIp
-            spacing: app.fs
-            Text {
-                id: labelHost
-                text: 'Host:'
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Rectangle{
-                id: xTiHost
-                width: r.width-labelHost.contentWidth-app.fs*2
-                height: app.fs*2
-                border.width: 2
-                clip: true
-                anchors.verticalCenter: parent.verticalCenter
-                TextInput{
-                    id: tiHost
-                    width: parent.width-app.fs*0.5
-                    height: parent.height-app.fs
-                    font.pixelSize: app.fs
-                    anchors.centerIn: parent
-                    KeyNavigation.tab: tiFotografo
-                    Keys.onReturnPressed: tiFotografo.focus=true
-                    onTextChanged: {
-                        if(text==='host'){
-                            apps.localHost=false
-                        }
-                        if(text==='localhost'){
-                            apps.localHost=true
-                        }
-                    }
-                }
-            }
-        }
-        Item{
-            width: 2
-            height: app.fs
-        }
         Text {
-            text: '<b>Técnico</b>'
+            text: '<b>Fotografo</b>'
             font.pixelSize: app.fs*2
         }
         Row{
@@ -169,7 +130,6 @@ XArea {
             anchors.horizontalCenter: parent.horizontalCenter
             KeyNavigation.tab: tiFotografo
             onClicked: {
-                tiHost.focus=false
                 tiFotografo.focus=false
                 tiFotografoTel.focus=false
                 tiFotografoEMail.focus=false
@@ -177,8 +137,6 @@ XArea {
                     apps.cFotografo=tiFotografo.text
                     apps.cFotografoTel=tiFotografoTel.text
                     apps.cFotografoEMail=tiFotografoEMail.text
-                    apps.serverUrl=tiHost.text
-                    app.serverUrl=tiHost.text
                     xAcceso.visible=true
                     app.mod=0
                 }else{

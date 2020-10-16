@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 2.0
 import QtMultimedia 5.0
 
 XArea {
@@ -12,6 +13,7 @@ XArea {
     property int mes: 0
     property int anio: 0
     property string uUrlTempCap: ''
+    property alias cbNoms: cbNombres
     Camera {
         id: camera
         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceFlash
@@ -26,7 +28,10 @@ XArea {
         imageCapture {
             onImageCaptured: {
                 photoPreview.source = preview  // Show the preview in an Image
+                photoPreview.width=photoPreview.sourceSize.width
                 photoPreview.visible=true
+                xInfoCap.visible=true
+                xInfoCap.updateData()
             }
         }
         onErrorStringChanged: {
@@ -38,6 +43,7 @@ XArea {
         spacing: app.fs
         anchors.horizontalCenter: parent.horizontalCenter
         VideoOutput {
+            id: videoOutPut
             source: camera
             width: r.width-app.fs
             //height: sourceRect.height
@@ -45,34 +51,50 @@ XArea {
             focus : visible // to receive focus and capture key events when visible
             visible: !photoPreview.visible
         }
-        Image {
-            id: photoPreview
+        XInfoCap{
+            id: xInfoCap
             width: r.width
-            fillMode: Image.PreserveAspectFit
+            height: photoPreview.height
+            onDataUpdated: {
+                xInfoCap.grabToImage(function(result) {
+                    let tempFileName=unik.getPath(2)+'/foto.jpg'
+                    console.log('Image Captured: '+tempFileName)
+                    result.saveToFile(tempFileName);
+                    r.uUrlTempCap=tempFileName
+                    btnCancelarCap.visible=true
+                    btnEnviarCap.visible=true
+                    photoPreview.width=r.width
+                    videoOutPut.width=r.width-app.fs
+                    xInfoCap.width=r.width
+                    flash.opacity=0.0
+                });
+            }
             visible: false
-            onStatusChanged: {
-                if(status===Image.Ready){
-                    photoPreview.grabToImage(function(result) {
-                        let tempFileName=unik.getPath(2)+'/foto.jpg'
-                        console.log('Image Captured: '+tempFileName)
-                        result.saveToFile(tempFileName);
-                        r.uUrlTempCap=tempFileName
-                        btnCancelarCap.visible=true
-                        btnEnviarCap.visible=true
-                    });
+            Image {
+                id: photoPreview
+                width: r.width
+                fillMode: Image.PreserveAspectFit
+                z:xInfoCap.z-1
+                visible: false
+                onStatusChanged: {
+                    if(status===Image.Ready){
+                        //xInfoCap.updateData()
+                    }
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onDoubleClicked: {
+                        photoPreview.visible=false
+                        xInfoCap.visible=false
+                    }
                 }
             }
-            MouseArea{
-                anchors.fill: parent
-                onDoubleClicked: photoPreview.visible=false
-            }
-            Rectangle{
-                anchors.fill: parent
-                border.width: 4
-                border.color: 'red'
-                color: 'transparent'
-            }
-
+            //            Rectangle{
+            //                anchors.fill: parent
+            //                border.width: 4
+            //                border.color: 'red'
+            //                color: 'transparent'
+            //            }
         }
 
         Text {
@@ -94,41 +116,97 @@ XArea {
             Boton{
                 id: btnCancelarCap
                 text: 'Cancelar'
+                fontSize: app.fs*2
                 onClicked: {
+                    xInfoCap.visible=false
                     photoPreview.visible=false
                 }
             }
             Boton{
                 id: btnEnviarCap
                 text: 'Enviar'
+                fontSize: app.fs*2
                 onClicked: {
                     sendCap()
                     xLoading.visible=true
                 }
             }
         }
-
         Boton{
             id: btnNuevaCaptura
             text: 'Nueva Captura'
+            fontSize: app.fs*2
             anchors.bottom: r.bottom
             anchors.bottomMargin: app.fs
             anchors.horizontalCenter: r.horizontalCenter
             visible: photoPreview.visible&&!btnCancelarCap.visible&&!btnEnviarCap.visible
             onClicked: {
+                xInfoCap.visible=false
                 photoPreview.visible=false
             }
         }
     }
-    Boton{
-        text: 'Capturar'
+    Column{
+        spacing: app.fs
+        visible: !photoPreview.visible
         anchors.bottom: r.bottom
         anchors.bottomMargin: app.fs
-        anchors.horizontalCenter: r.horizontalCenter
-        visible: !photoPreview.visible
-        fontSize: app.fs*2
-        onClicked: {
-            camera.imageCapture.capture();
+        anchors.horizontalCenter: parent.horizontalCenter
+        ComboBox{
+            id: cbNombres
+            width: r.width-app.fs
+            anchors.horizontalCenter: parent.horizontalCenter
+            Timer{
+                running: true
+                repeat: true
+                interval: 1000
+                onTriggered: {
+                    if(cbNombres.count===0){
+                        cbNombres.model=manSqlData.getNombres()
+                    }else{
+                        stop()
+                    }
+                }
+            }
+        }
+        Row{
+            spacing: app.fs
+            anchors.horizontalCenter: parent.horizontalCenter
+            Boton{
+                text: 'Agregar'
+                visible: !photoPreview.visible
+                fontSize: app.fs*2
+                onClicked: {
+                    xAddNom.visible=true
+                }
+            }
+            Boton{
+                text: 'Capturar'
+                fontSize: app.fs*2
+                enabled: cbNombres.currentIndex!==0
+                onClicked: {
+                    if(cbNombres.currentIndex===0){
+                        return
+                    }
+                    xInfoCap.fotode=cbNombres.currentText
+                    flash.opacity=1.0
+                }
+            }
+        }
+    }
+    Rectangle{
+        id: flash
+        anchors.fill: r
+        opacity: 0.0
+        Behavior on opacity{
+            NumberAnimation{duration: 150}
+        }
+        onOpacityChanged: {
+            if(opacity===1.0){
+                videoOutPut.width=videoOutPut.sourceRect.width
+                xInfoCap.width=videoOutPut.width
+                camera.imageCapture.capture();
+            }
         }
     }
 
