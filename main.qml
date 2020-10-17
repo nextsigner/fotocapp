@@ -36,6 +36,9 @@ ApplicationWindow {
         if(mod===2){
             xXMenu.cBtn=bot3
         }
+        if(mod===3){
+            xXMenu.cBtn=bot4
+        }
         marcador.x=xXMenu.cBtn.x+xXMenu.cBtn.width/2-marcador.width/2
     }
 
@@ -95,7 +98,7 @@ ApplicationWindow {
                         }
                         Boton{
                             id: bot2;
-                            text: 'Configurar'
+                            text: 'Control'
                             fontSize: app.fs*1.5
                             horizontalMargin: app.fs*0.1
                             onClicked: app.mod=1
@@ -103,17 +106,26 @@ ApplicationWindow {
                         }
                         Boton{
                             id: bot3;
-                            text: 'Acerca de'
+                            text: 'Configurar'
                             fontSize: app.fs*1.5
                             horizontalMargin: app.fs*0.1
                             onClicked: app.mod=2
                             opacity: app.mod===2?1.0:0.65
                         }
+                        Boton{
+                            id: bot4;
+                            text: '?'
+                            fontSize: app.fs*1.5
+                            horizontalMargin: app.fs*0.1
+                            onClicked: app.mod=3
+                            opacity: app.mod===3?1.0:0.65
+                        }
                     }
                 }
                 XCamera{id: xCamera;visible: app.mod===0}
-                XConfig{id: xConfig;visible: app.mod===1}
-                XAbout{id: xAbout;visible: app.mod===2}
+                XControl{id: xControl;visible: app.mod===1}
+                XConfig{id: xConfig;visible: app.mod===2}
+                XAbout{id: xAbout;visible: app.mod===3}
 
             }
         }

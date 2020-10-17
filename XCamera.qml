@@ -136,8 +136,8 @@ XArea {
             id: btnNuevaCaptura
             text: 'Nueva Captura'
             fontSize: app.fs*2
-            anchors.bottom: r.bottom
-            anchors.bottomMargin: app.fs
+            //anchors.bottom: r.bottom
+            //anchors.bottomMargin: app.fs
             anchors.horizontalCenter: r.horizontalCenter
             visible: photoPreview.visible&&!btnCancelarCap.visible&&!btnEnviarCap.visible
             onClicked: {
