@@ -225,9 +225,12 @@ XArea {
             }
         }
     }
-
-
-
+    Image {
+        id: cap
+        width: r.width*0.5
+        fillMode: Image.PreserveAspectFit
+        source: "https://http2.mlstatic.com/D_NQ_NP_747160-MLA40631244814_022020-O.webp"
+    }
     function sendCap(){
         if(apps.cAdmin==='null'){
             //return
@@ -240,7 +243,10 @@ XArea {
         let url=app.serverUrl+':'+app.portRequest+'/fotocapp/nuevacaptura?r='+d.getTime()//+consulta
         console.log('Post '+app.moduleName+' server from '+url)
         var jsonCtx='{"ctx":{"administrador":"'+administrador+'", "fotografo":"'+fotografo+'", "telefono":"'+apps.cFotografoTel+'", "email":"'+apps.cFotografoEMail+'", "fotode":"'+fotode+'"}}'
-        var params = 'ctx='+jsonCtx+'&imagen='+unik.imageCameraCapturaToByteArray(r.uUrlTempCap)
+        var imageData=unik.imageCameraCapturaToByteArray(r.uUrlTempCap)
+        console.log('::::'+imageData)
+        cap.source="data:image/png;base64,"+imageData;
+        var params = 'ctx='+jsonCtx+'&imagen='+imageData
         var req = new XMLHttpRequest();
         req.open('POST', url, true);
         req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
