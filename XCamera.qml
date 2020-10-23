@@ -47,6 +47,7 @@ XArea {
             source: camera
             width: r.width-app.fs
             //height: sourceRect.height
+            rotation: 180
             anchors.horizontalCenter: parent.horizontalCenter
             focus : visible // to receive focus and capture key events when visible
             visible: !photoPreview.visible
@@ -75,6 +76,7 @@ XArea {
                 width: r.width
                 fillMode: Image.PreserveAspectFit
                 z:xInfoCap.z-1
+                rotation: videoOutPut.rotation
                 visible: false
                 onStatusChanged: {
                     if(status===Image.Ready){
@@ -225,27 +227,27 @@ XArea {
             }
         }
     }
-    Image {
-        id: cap
-        width: r.width*0.5
-        fillMode: Image.PreserveAspectFit
-        source: "https://http2.mlstatic.com/D_NQ_NP_747160-MLA40631244814_022020-O.webp"
-    }
+//    Image {
+//        id: cap
+//        width: r.width*0.5
+//        fillMode: Image.PreserveAspectFit
+//        source: "https://http2.mlstatic.com/D_NQ_NP_747160-MLA40631244814_022020-O.webp"
+//    }
     function sendCap(){
         if(apps.cAdmin==='null'){
             //return
         }
-        let administrador='qt'
-        let fotografo='qt1'
-        let fotode='tq1'
+        let administrador=apps.cAdmin
+        let fotografo=apps.cFotografoNom
+        let fotode=cbNombres.currentText
         xLoading.visible=true
         let d = new Date(Date.now())
         let url=app.serverUrl+':'+app.portRequest+'/fotocapp/nuevacaptura?r='+d.getTime()//+consulta
         console.log('Post '+app.moduleName+' server from '+url)
         var jsonCtx='{"ctx":{"administrador":"'+administrador+'", "fotografo":"'+fotografo+'", "telefono":"'+apps.cFotografoTel+'", "email":"'+apps.cFotografoEMail+'", "fotode":"'+fotode+'"}}'
         var imageData=unik.imageCameraCapturaToByteArray(r.uUrlTempCap)
-        console.log('::::'+imageData)
-        cap.source="data:image/png;base64,"+imageData;
+        //console.log('::::'+imageData)
+        //cap.source="data:image/png;base64,"+imageData;
         var params = 'ctx='+jsonCtx+'&imagen='+imageData
         var req = new XMLHttpRequest();
         req.open('POST', url, true);
