@@ -178,6 +178,13 @@ XArea {
                     tiFotografo.focus=false
                     tiFotografoTel.focus=false
                     tiFotografoEMail.focus=false
+                    if(tiAdministrador.text==='localhost'){
+                        apps.localHost=!apps.localHost
+                        let msg='Se ha cambiado a localHost '+apps.localHost+'\nserver'+app.serverUrl+'\nportRequest='+app.portRequest+'\nportFiles='+app.portFiles
+                        let comp=Qt.createComponent("XMsgBox.qml")
+                        let obj=comp.createObject(r, {text:msg})
+                        return
+                    }
                     if(tiFotografo.text!==''&&tiFotografoTel.text!==''&&tiFotografoEMail.text!==''){
                         apps.cAdmin=tiAdministrador.text
                         apps.cFotografoNom=tiFotografo.text

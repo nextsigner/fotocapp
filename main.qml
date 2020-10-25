@@ -45,13 +45,19 @@ ApplicationWindow {
     Settings{
         id: apps
         fileName: moduleName+'.cfg'
-        property bool localHost: true
+        property bool localHost: false
         property string cAdmin: ''
         property string cFotografoNom: ''
         property string cFotografoEMail: ''
         property string cFotografoTel: ''
         onLocalHostChanged: {
-            if(!localHost)JS.getServerUrl()
+            if(!localHost){
+                JS.getServerUrl()
+            }else{
+                serverUrl='http://localhost'
+                portRequest=8080
+                portFiles=8081
+            }
         }
     }
 

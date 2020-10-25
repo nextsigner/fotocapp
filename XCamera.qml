@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
-import QtMultimedia 5.0
+import QtMultimedia 5.12
 
 XArea {
     id: r
@@ -17,7 +17,8 @@ XArea {
     Camera {
         id: camera
         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceFlash
-
+        deviceId:  QtMultimedia.availableCameras[1].deviceId
+        //captureMode: Camera.CaptureViewfinder
         exposure {
             exposureCompensation: -1.0
             exposureMode: Camera.ExposurePortrait
@@ -42,16 +43,26 @@ XArea {
     Column{
         spacing: app.fs
         anchors.horizontalCenter: parent.horizontalCenter
-        VideoOutput {
-            id: videoOutPut
-            source: camera
-            width: r.width-app.fs
-            //height: sourceRect.height
-            rotation: 180
+        Rectangle{
+            id:xVO
+            width: r.width
+            height: 180
+            border.width: 0
+            border.color: 'blue'
+            color: 'transparent'
             anchors.horizontalCenter: parent.horizontalCenter
-            focus : visible // to receive focus and capture key events when visible
             visible: !photoPreview.visible
+            VideoOutput {
+                id: videoOutPut
+                anchors.top: parent.top
+                source: camera
+                width: r.width-app.fs
+                height: parent.height
+                rotation: 180
+                focus : visible // to receive focus and capture key events when visible
+            }
         }
+
         XInfoCap{
             id: xInfoCap
             width: r.width
@@ -122,6 +133,7 @@ XArea {
                 onClicked: {
                     xInfoCap.visible=false
                     photoPreview.visible=false
+                    xLoading.visible=false
                 }
             }
             Boton{
@@ -152,7 +164,7 @@ XArea {
         spacing: app.fs
         visible: !photoPreview.visible
         anchors.bottom: r.bottom
-        anchors.bottomMargin: app.fs
+        anchors.bottomMargin: app.fs*3
         anchors.horizontalCenter: parent.horizontalCenter
         ComboBox{
             id: cbNombres
@@ -185,7 +197,8 @@ XArea {
             Boton{
                 text: 'Capturar'
                 fontSize: app.fs*2
-                opacity: cbNombres.currentIndex===0?0.5:1.0
+                opacity: cbNombres.currentIndex===0?0.0:1.0
+                enabled: opacity===1.0
                 onClicked: {
                     if(apps.cAdmin===''){
                         let msg='Para utilizar esta aplicación hay que anotar el nombre de la empresa que recibirá las capturas. \nPara hacer esto hay que ir al menú Configurar y poner los datos del fotografo.'
@@ -212,6 +225,15 @@ XArea {
             }
         }
     }
+    Text{
+        id: infoVO
+        text: 'VO'
+        font.pixelSize: app.fs*2
+        color: 'yellow'
+        width: r.width-app.fs
+        wrapMode: Text.WordWrap
+        visible: false
+    }
     Rectangle{
         id: flash
         anchors.fill: r
@@ -227,12 +249,22 @@ XArea {
             }
         }
     }
-//    Image {
-//        id: cap
-//        width: r.width*0.5
-//        fillMode: Image.PreserveAspectFit
-//        source: "https://http2.mlstatic.com/D_NQ_NP_747160-MLA40631244814_022020-O.webp"
-//    }
+    Timer{
+        running: r.visible
+        repeat: true
+        interval: 500
+        onTriggered: {
+            let w1=videoOutPut.sourceRect.width
+            let dw1=w1-r.width
+            let h1=videoOutPut.sourceRect.height
+            //Porcentaje de Reducción de Ancho
+            let porcRW=parseFloat(100-dw1/w1*100)
+            let nh1=h1/100*porcRW
+            //infoVO.text='RW:'+r.width+' WC:'+w1+' DW:'+dw1+' P1:'+porcRW+' HC:'+h1+' NH:'+nh1
+            xVO.height=nh1+app.fs*2
+            //if(){}
+        }
+    }
     function sendCap(){
         if(apps.cAdmin==='null'){
             //return
@@ -265,15 +297,17 @@ XArea {
                         btnCancelarCap.visible=false
                     } catch(e) {
                         labelStatus.text='Error al enviar la captura. '+e
+                        xLoading.visible=false
                     }
                     btnEnviarCap.enabled=true
                 }else{
-                    console.log("Error el cargar el servidor de Ppres. Code 1\n");
+                    console.log("Error el cargar el servidor de FotoCapp. Code 1\n");
                     btnEnviarCap.enabled=true
-                    let msg='Error al enviar la captura. El servidor no está respondiendo correctamente a este requerimiento.'
+                    let msg='Error al enviar la captura.\n\nEl servidor no está respondiendo correctamente a este requerimiento.\n\nServidor no disponible: '+app.serverUrl+' puerto 1='+app.portRequest+' puerto 2='+app.portFiles
                     labelStatus.text=msg
                     let comp=Qt.createComponent("XMsgBox.qml")
                     let obj=comp.createObject(r, {text:msg})
+                    xLoading.visible=false
                 }
                 xLoading.visible=false
             }
