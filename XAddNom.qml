@@ -6,11 +6,11 @@ XArea {
     height: xApp.height
     onVisibleChanged: {
         if(visible){
-            tiFotografo.text=apps.cFotografo
-            tiFotografoTel.text=apps.cFotografoTel
-            tiFotografoEMail.text=apps.cFotografoEMail
-            tiHost.text=apps.serverUrl
-            tiHost.focus=true
+//            tiFotografo.text=apps.cFotografo
+//            tiFotografoTel.text=apps.cFotografoTel
+//            tiFotografoEMail.text=apps.cFotografoEMail
+//            tiHost.text=apps.serverUrl
+//            tiHost.focus=true
         }
     }
     Rectangle{
@@ -77,6 +77,7 @@ XArea {
                 fontSize: app.fs*2
                 KeyNavigation.tab: tiNombre
                 onClicked: {
+                    tiNombre.focus=false
                     let a = manSqlData.getNombres()
                     console.log('Nombres pre existentes: '+a.toString())
                     if(tiNombre.text!==''&&a.indexOf(tiNombre.text)<0){

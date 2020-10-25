@@ -50,6 +50,8 @@ ApplicationWindow {
         property string cFotografoNom: ''
         property string cFotografoEMail: ''
         property string cFotografoTel: ''
+        property int cameraIndex: 0
+        property int cameraRotation: 0
         onLocalHostChanged: {
             if(!localHost){
                 JS.getServerUrl()

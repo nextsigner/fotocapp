@@ -17,7 +17,7 @@ XArea {
     Camera {
         id: camera
         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceFlash
-        deviceId:  QtMultimedia.availableCameras[1].deviceId
+        deviceId:  QtMultimedia.availableCameras[apps.cameraIndex].deviceId
         //captureMode: Camera.CaptureViewfinder
         exposure {
             exposureCompensation: -1.0
@@ -52,14 +52,64 @@ XArea {
             color: 'transparent'
             anchors.horizontalCenter: parent.horizontalCenter
             visible: !photoPreview.visible
+            rotation: videoOutPut.rotation
+            MouseArea{
+                anchors.fill: parent
+                onClicked: rowBtnCamera.opacity=1.0
+            }
             VideoOutput {
                 id: videoOutPut
                 anchors.top: parent.top
                 source: camera
                 width: r.width-app.fs
                 height: parent.height
-                rotation: 180
+                rotation: apps.cameraRotation
                 focus : visible // to receive focus and capture key events when visible
+            }
+            Row{
+                id: rowBtnCamera
+                opacity: 0.0
+                spacing: app.fs
+                anchors.centerIn: parent
+                rotation: 360-videoOutPut.rotation
+                Behavior on opacity{NumberAnimation{duration: 500}}
+                Timer{
+                    id: tHideBtnsCamera
+                    running: rowBtnCamera.opacity===1.0
+                    repeat: false
+                    interval: 5000
+                    onTriggered: rowBtnCamera.opacity=0.0
+                }
+                Boton{
+                    id: btnCameraRotation
+                    text: 'Rotar Cámara'
+                    fontSize: app.fs*2
+                    enabled: rowBtnCamera.opacity===1.0
+                    anchors.horizontalCenter: r.horizontalCenter
+                    onClicked: {
+                        apps.cameraRotation+=90
+                        tHideBtnsCamera.restart()
+                    }
+                }
+                Boton{
+                    id: btnCameraSelect
+                    text: 'Cambiar Cámara'
+                    fontSize: app.fs*2
+                    opacity: QtMultimedia.availableCameras.length>1?1.0:0.5
+                    enabled: rowBtnCamera.opacity===1.0
+                    anchors.horizontalCenter: r.horizontalCenter
+                    onClicked: {
+                        if(QtMultimedia.availableCameras.length-1>apps.cameraIndex){
+                            apps.cameraIndex++
+                        }else{
+                            apps.cameraIndex=0
+                        }
+                        let msg='Se ha cambiado a la cámara '+parseInt(apps.cameraIndex + 1)+'\nEste dispositivo tiene en total '+QtMultimedia.availableCameras.length+' cámaras.'
+                        let comp=Qt.createComponent("XMsgBox.qml")
+                        let obj=comp.createObject(r, {text:msg})
+                        tHideBtnsCamera.restart()
+                    }
+                }
             }
         }
 
@@ -170,6 +220,7 @@ XArea {
             id: cbNombres
             width: r.width-app.fs
             anchors.horizontalCenter: parent.horizontalCenter
+            font.pixelSize: app.fs*2
             Timer{
                 running: true
                 repeat: true
