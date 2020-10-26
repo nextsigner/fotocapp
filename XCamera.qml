@@ -6,6 +6,7 @@ XArea {
     id: r
     width: xApp.width
     height: xApp.height-xMenu.height
+    clip: true
     property int h: 0
     property int m: 0
     property int s: 0
@@ -45,14 +46,15 @@ XArea {
         anchors.horizontalCenter: parent.horizontalCenter
         Rectangle{
             id:xVO
-            width: r.width
-            height: 180
+            width: apps.cameraRotation===90?180:r.width
+            height: apps.cameraRotation===90?r.width:180
             border.width: 0
             border.color: 'blue'
             color: 'transparent'
             anchors.horizontalCenter: parent.horizontalCenter
             visible: !photoPreview.visible
-            rotation: videoOutPut.rotation
+            rotation: apps.cameraRotation
+            clip: true
             MouseArea{
                 anchors.fill: parent
                 onClicked: rowBtnCamera.opacity=1.0
@@ -63,53 +65,8 @@ XArea {
                 source: camera
                 width: r.width-app.fs
                 height: parent.height
-                rotation: apps.cameraRotation
+                //rotation: apps.cameraRotation
                 focus : visible // to receive focus and capture key events when visible
-            }
-            Row{
-                id: rowBtnCamera
-                opacity: 0.0
-                spacing: app.fs
-                anchors.centerIn: parent
-                rotation: 360-videoOutPut.rotation
-                Behavior on opacity{NumberAnimation{duration: 500}}
-                Timer{
-                    id: tHideBtnsCamera
-                    running: rowBtnCamera.opacity===1.0
-                    repeat: false
-                    interval: 5000
-                    onTriggered: rowBtnCamera.opacity=0.0
-                }
-                Boton{
-                    id: btnCameraRotation
-                    text: 'Rotar Cámara'
-                    fontSize: app.fs*2
-                    enabled: rowBtnCamera.opacity===1.0
-                    anchors.horizontalCenter: r.horizontalCenter
-                    onClicked: {
-                        apps.cameraRotation+=90
-                        tHideBtnsCamera.restart()
-                    }
-                }
-                Boton{
-                    id: btnCameraSelect
-                    text: 'Cambiar Cámara'
-                    fontSize: app.fs*2
-                    opacity: QtMultimedia.availableCameras.length>1?1.0:0.5
-                    enabled: rowBtnCamera.opacity===1.0
-                    anchors.horizontalCenter: r.horizontalCenter
-                    onClicked: {
-                        if(QtMultimedia.availableCameras.length-1>apps.cameraIndex){
-                            apps.cameraIndex++
-                        }else{
-                            apps.cameraIndex=0
-                        }
-                        let msg='Se ha cambiado a la cámara '+parseInt(apps.cameraIndex + 1)+'\nEste dispositivo tiene en total '+QtMultimedia.availableCameras.length+' cámaras.'
-                        let comp=Qt.createComponent("XMsgBox.qml")
-                        let obj=comp.createObject(r, {text:msg})
-                        tHideBtnsCamera.restart()
-                    }
-                }
             }
         }
 
@@ -285,6 +242,58 @@ XArea {
         wrapMode: Text.WordWrap
         visible: false
     }
+    Row{
+        id: rowBtnCamera
+        opacity: 0.0
+        spacing: app.fs
+        anchors.horizontalCenter: r.horizontalCenter
+        anchors.top: r.top
+        anchors.topMargin: r.width*0.35
+        Behavior on opacity{NumberAnimation{duration: 500}}
+        Timer{
+            id: tHideBtnsCamera
+            running: rowBtnCamera.opacity===1.0
+            repeat: false
+            interval: 5000
+            onTriggered: rowBtnCamera.opacity=0.0
+        }
+        Boton{
+            id: btnCameraRotation
+            text: 'Rotar Cámara'
+            fontSize: app.fs*2
+            enabled: rowBtnCamera.opacity===1.0
+            anchors.horizontalCenter: r.horizontalCenter
+            onClicked: {
+                if(apps.cameraRotation===0){
+                    apps.cameraRotation=90
+                }else if(apps.cameraRotation===90){
+                    apps.cameraRotation=180
+                }else{
+                    apps.cameraRotation=0
+                }
+                tHideBtnsCamera.restart()
+            }
+        }
+        Boton{
+            id: btnCameraSelect
+            text: 'Cambiar Cámara'
+            fontSize: app.fs*2
+            opacity: QtMultimedia.availableCameras.length>1?1.0:0.5
+            enabled: rowBtnCamera.opacity===1.0
+            anchors.horizontalCenter: r.horizontalCenter
+            onClicked: {
+                if(QtMultimedia.availableCameras.length-1>apps.cameraIndex){
+                    apps.cameraIndex++
+                }else{
+                    apps.cameraIndex=0
+                }
+                let msg='Se ha cambiado a la cámara '+parseInt(apps.cameraIndex + 1)+'\nEste dispositivo tiene en total '+QtMultimedia.availableCameras.length+' cámaras.'
+                let comp=Qt.createComponent("XMsgBox.qml")
+                let obj=comp.createObject(r, {text:msg})
+                tHideBtnsCamera.restart()
+            }
+        }
+    }
     Rectangle{
         id: flash
         anchors.fill: r
@@ -312,7 +321,14 @@ XArea {
             let porcRW=parseFloat(100-dw1/w1*100)
             let nh1=h1/100*porcRW
             //infoVO.text='RW:'+r.width+' WC:'+w1+' DW:'+dw1+' P1:'+porcRW+' HC:'+h1+' NH:'+nh1
-            xVO.height=nh1+app.fs*2
+            if(apps.cameraRotation===90){
+                xVO.width=nh1+app.fs*2
+                xVO.height=r.width
+            }else{
+                xVO.width=r.width
+                xVO.height=nh1+app.fs*2
+            }
+
             //if(){}
         }
     }
