@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 Rectangle {
     id: r
-    width: app.width-r.fontSize*2
+    width: xApp.width-r.fontSize*2
     height: textMsg.contentHeight+r.fontSize*8
     border.width: 2
     radius: app.fs*0.5
