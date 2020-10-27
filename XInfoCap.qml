@@ -2,8 +2,8 @@ import QtQuick 2.0
 
 Rectangle {
     id: r
-    border.width: 2
-    border.color: 'blue'
+//    border.width: 2
+//    border.color: 'blue'
     color: 'transparent'
     //anchors.fill: parent
     property string momento: '01/01/2020 00:00:00'

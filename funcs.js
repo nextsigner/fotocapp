@@ -22,3 +22,8 @@ function getServerUrl(){
     };
     req.send(null);
 }
+
+function showMsgBox(msg){
+    let comp=Qt.createComponent("XMsgBox.qml")
+    let obj=comp.createObject(containerObjs, {text:msg})
+}

@@ -1,12 +1,14 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
 import QtMultimedia 5.12
+import "funcs.js" as JS
 
 XArea {
     id: r
     width: xApp.width
     height: xApp.height-xMenu.height
     clip: true
+    //color: 'black'
     property int h: 0
     property int m: 0
     property int s: 0
@@ -49,8 +51,8 @@ XArea {
             width: apps.cameraRotation===90?180:r.width
             height: apps.cameraRotation===90?r.width:180
             border.width: 0
-            border.color: 'blue'
-            color: 'transparent'
+            border.color: '#ff8833'
+            color: 'black'
             anchors.horizontalCenter: parent.horizontalCenter
             visible: !photoPreview.visible
             rotation: apps.cameraRotation
@@ -61,7 +63,8 @@ XArea {
             }
             VideoOutput {
                 id: videoOutPut
-                anchors.top: parent.top
+                anchors.centerIn: parent
+                //anchors.top: parent.top
                 source: camera
                 width: r.width-app.fs
                 height: parent.height
@@ -74,6 +77,9 @@ XArea {
             id: xInfoCap
             width: r.width
             height: photoPreview.height
+            clip: true
+            //color: 'black'
+            //rotation: apps.cameraRotation
             onDataUpdated: {
                 xInfoCap.grabToImage(function(result) {
                     let tempFileName=unik.getPath(2)+'/foto.jpg'
@@ -89,12 +95,17 @@ XArea {
                 });
             }
             visible: false
+            Rectangle{
+                anchors.fill: parent
+                color: 'black'
+                z: photoPreview.z-1
+            }
             Image {
                 id: photoPreview
                 width: r.width
                 fillMode: Image.PreserveAspectFit
                 z:xInfoCap.z-1
-                rotation: videoOutPut.rotation
+                rotation: apps.cameraRotation
                 visible: false
                 onStatusChanged: {
                     if(status===Image.Ready){
@@ -116,7 +127,6 @@ XArea {
             //                color: 'transparent'
             //            }
         }
-
         Text {
             id: labelStatus
             text: 'Mostrando Captura'
@@ -210,20 +220,17 @@ XArea {
                 onClicked: {
                     if(apps.cAdmin===''){
                         let msg='Para utilizar esta aplicación hay que anotar el nombre de la empresa que recibirá las capturas. \nPara hacer esto hay que ir al menú Configurar y poner los datos del fotografo.'
-                        let comp=Qt.createComponent("XMsgBox.qml")
-                        let obj=comp.createObject(r, {text:msg})
+                        JS.showMsgBox(msg)
                         return
                     }
                     if(apps.cFotografoNom===''){
                         let msg='Para utilizar esta aplicación hay que anotar el nombre del fotógrafo. \nPara hacer esto hay que ir al menú Configurar y poner los datos del fotografo.'
-                        let comp=Qt.createComponent("XMsgBox.qml")
-                        let obj=comp.createObject(r, {text:msg})
+                        JS.showMsgBox(msg)
                         return
                     }
                     if(cbNombres.currentIndex===0){
                         let msg='Para realizar una captura primero hay que elegir un nombre.'
-                        let comp=Qt.createComponent("XMsgBox.qml")
-                        let obj=comp.createObject(r, {text:msg})
+                        JS.showMsgBox(msg)
                         return
                     }
                     xInfoCap.fotografo=apps.cFotografoNom
@@ -288,8 +295,7 @@ XArea {
                     apps.cameraIndex=0
                 }
                 let msg='Se ha cambiado a la cámara '+parseInt(apps.cameraIndex + 1)+'\nEste dispositivo tiene en total '+QtMultimedia.availableCameras.length+' cámaras.'
-                let comp=Qt.createComponent("XMsgBox.qml")
-                let obj=comp.createObject(r, {text:msg})
+                JS.showMsgBox(msg)
                 tHideBtnsCamera.restart()
             }
         }
@@ -322,11 +328,11 @@ XArea {
             let nh1=h1/100*porcRW
             //infoVO.text='RW:'+r.width+' WC:'+w1+' DW:'+dw1+' P1:'+porcRW+' HC:'+h1+' NH:'+nh1
             if(apps.cameraRotation===90){
-                xVO.width=nh1+app.fs*2
+                xVO.width=nh1//+app.fs*2
                 xVO.height=r.width
             }else{
                 xVO.width=r.width
-                xVO.height=nh1+app.fs*2
+                xVO.height=nh1//+app.fs*2
             }
 
             //if(){}
@@ -367,13 +373,14 @@ XArea {
                         xLoading.visible=false
                     }
                     btnEnviarCap.enabled=true
+                    btnEnviarCap.text='Enviar'
                 }else{
                     console.log("Error el cargar el servidor de FotoCapp. Code 1\n");
                     btnEnviarCap.enabled=true
+                    btnEnviarCap.text='Reintentar Envío'
                     let msg='Error al enviar la captura.\n\nEl servidor no está respondiendo correctamente a este requerimiento.\n\nServidor no disponible: '+app.serverUrl+' puerto 1='+app.portRequest+' puerto 2='+app.portFiles
                     labelStatus.text=msg
-                    let comp=Qt.createComponent("XMsgBox.qml")
-                    let obj=comp.createObject(r, {text:msg})
+                    JS.showMsgBox(msg)
                     xLoading.visible=false
                 }
                 xLoading.visible=false

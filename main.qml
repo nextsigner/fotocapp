@@ -13,7 +13,8 @@ ApplicationWindow {
     title: moduleName
     property string moduleName: 'fotocapp'
     property bool mobile: Qt.platform.os==='android'
-    property int fs: width*0.03
+    property int fs: rot?width*0.03:width*0.015
+    property bool rot: Screen.width>Screen.height
     property color c1: 'white'
     property color c2: 'black'
     property color c3: '#ccc'
@@ -66,7 +67,9 @@ ApplicationWindow {
     ManSqliteData{id: manSqlData}
     Item{
         id: xApp
-        anchors.fill: parent
+        width: !app.rot?app.width:app.height
+        height: !app.rot?app.height:app.width
+        rotation: !app.rot?0:90
         Flickable{
             id: flick
             anchors.fill: parent
@@ -144,6 +147,7 @@ ApplicationWindow {
                 if(!visible)xCamera.cbNoms.model=manSqlData.getNombres()
             }
         }
+        Item{id:containerObjs;width: xApp.width;anchors.horizontalCenter: parent.horizontalCenter}
         XLoading{id: xLoading}
     }
     Text{

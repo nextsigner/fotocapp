@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import "funcs.js" as JS
 
 XArea {
     id: r
@@ -6,9 +7,9 @@ XArea {
     height: xApp.height-xMenu.height
     property int fontSize: app.fs*2
     onVisibleChanged: {
-                if(visible){
-                  getAsistencias(apps.cAdmin)
-                }
+        if(visible){
+            getAsistencias(apps.cAdmin)
+        }
     }
     //    MouseArea{
     //        anchors.fill: r
@@ -22,16 +23,22 @@ XArea {
         anchors.top: parent.top
         anchors.topMargin: app.fs
         spacing: app.fs
-        Text {
-            text: '<b>Control</b>'
-            font.pixelSize: app.fs*2
+        Column{
+            id: colHeaderControl
             anchors.horizontalCenter: parent.horizontalCenter
+            Text {
+                text: '<b>Control</b>'
+                font.pixelSize: app.fs*2
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
         }
         ListView{
             id: lv
             width: r.width-app.fs
-            height: r.parent.height
-            spacing: app.fs
+            height: r.height-colHeaderControl.height-app.fs*10
+            //contentHeight: height*2
+            clip: true
+            //spacing: app.fs
             anchors.horizontalCenter: parent.horizontalCenter
             currentIndex: -1
             model: lm
@@ -46,13 +53,21 @@ XArea {
         Rectangle{
             id: xCompAsistencia
             width: lv.width
-            height: index===lv.currentIndex?colItemCap.height+app.fs:app.fs*3
+            height: index===lv.currentIndex?colItemCap.height+app.fs:labelAsistencia.contentHeight+app.fs*2
             border.width: 2
             border.color: lv.currentIndex===index?'red':'black'
             color: lv.currentIndex===index?'black':'white'
             clip: true
+            property int rowMod1Height: labelAsistencia.contentHeight+app.fs*2
             property string momento: '?'
             property string imageData: vImageData
+            property int uHeight: rowMod1Height
+            onHeightChanged:{
+                if(uHeight>height){
+                    lv.contentY=xCompAsistencia.y
+                }
+                rowMod1Height=height
+            }
             Behavior on height{
                 NumberAnimation{duration: 250}
             }
@@ -78,7 +93,7 @@ XArea {
                 //anchors.centerIn: parent
                 Text{
                     id: labelAsistencia
-                    font.pixelSize: app.fs
+                    font.pixelSize: app.fs*1.5
                     text:  ' '+vFotoDe+' '+momento
                     color: lv.currentIndex===index?'white':'black'
                     width: parent.width-app.fs*2
@@ -131,6 +146,7 @@ XArea {
     }
 
     Boton{
+        id: btnActualizar
         text: 'Actualizar'
         fontSize: app.fs*2
         anchors.bottom: parent.bottom
@@ -154,9 +170,9 @@ XArea {
                     console.log('Asistencias: '+req.responseText)
                     setAsistenciasResult(req.responseText)
                 }else{
-                    console.log("Error el cargar el servidor de FotoCapp. Code 1\n");
-                    let comp=Qt.createComponent("XMsgBox.qml")
-                    let obj=comp.createObject(r, {text:'Error! El servidor no está disponible.'})
+                    //console.log("Error el cargar el servidor de FotoCapp. Code 1\n");
+                    let msg='Error! El servidor no está disponible.'
+                    JS.showMsgBox(msg)
                 }
                 xLoading.visible=false
             }
@@ -186,8 +202,7 @@ XArea {
                     loadCap(cap, json.asistencias._id, json.asistencias.imagen)
                 }else{
                     let msg='Error el cargar imagen desde el servidor de FotoCapp. Code 1'
-                    let comp=Qt.createComponent("XMsgBox.qml")
-                    let obj=comp.createObject(r, {text:msg})
+                    JS.showMsgBox(msg)
                 }
                 xLoading.visible=false
             }
