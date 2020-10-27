@@ -13,7 +13,7 @@ ApplicationWindow {
     title: moduleName
     property string moduleName: 'fotocapp'
     property bool mobile: Qt.platform.os==='android'
-    property int fs: rot?width*0.03:width*0.015
+    property int fs: !rot?width*0.03:width*0.015
     property bool rot: Screen.width>Screen.height
     property color c1: 'white'
     property color c2: 'black'
@@ -70,6 +70,7 @@ ApplicationWindow {
         width: !app.rot?app.width:app.height
         height: !app.rot?app.height:app.width
         rotation: !app.rot?0:90
+        anchors.centerIn: parent
         Flickable{
             id: flick
             anchors.fill: parent
