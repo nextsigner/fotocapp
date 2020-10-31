@@ -14,7 +14,7 @@ ApplicationWindow {
     property string moduleName: 'fotocapp'
     property bool mobile: Qt.platform.os==='android'
     property int fs: !rot?width*0.03:width*0.015
-    property bool rot: Screen.width>Screen.height
+    property bool rot: Qt.platform.os==='android'&&Screen.width>Screen.height
     property color c1: 'white'
     property color c2: 'black'
     property color c3: '#ccc'

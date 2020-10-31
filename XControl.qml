@@ -167,11 +167,11 @@ XArea {
             if (req.readyState === 4) {
                 if(req.status === 200){
                     //let json=JSON.parse(req.responseText)
-                    console.log('Asistencias: '+req.responseText)
+                    //console.log('Asistencias: '+req.responseText)
                     setAsistenciasResult(req.responseText)
                 }else{
                     //console.log("Error el cargar el servidor de FotoCapp. Code 1\n");
-                    let msg='Error! El servidor no está disponible.'
+                    let msg='Error al consultar datos.\n\nEl servidor no está respondiendo correctamente a este requerimiento.\n\nServidor no disponible: '+app.serverUrl+' puerto 1='+app.portRequest+' puerto 2='+app.portFiles
                     JS.showMsgBox(msg)
                 }
                 xLoading.visible=false

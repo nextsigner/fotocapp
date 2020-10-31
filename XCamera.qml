@@ -71,8 +71,22 @@ XArea {
                 //rotation: apps.cameraRotation
                 focus : visible // to receive focus and capture key events when visible
             }
+            Rectangle{
+                id: flashVO
+                anchors.fill: parent
+                opacity: 0.0
+                property int dur: 0
+                Behavior on opacity{
+                    NumberAnimation{duration: flashVO.dur}
+                }
+                onOpacityChanged: {
+                    if(opacity===1.0){
+                        flashVO.dur=1000
+                        flashVO.opacity=0.0
+                    }
+                }
+            }
         }
-
         XInfoCap{
             id: xInfoCap
             width: r.width
@@ -105,7 +119,7 @@ XArea {
                 width: r.width
                 fillMode: Image.PreserveAspectFit
                 z:xInfoCap.z-1
-                rotation: apps.cameraRotation
+                //rotation: apps.cameraRotation
                 visible: false
                 onStatusChanged: {
                     if(status===Image.Ready){
@@ -256,7 +270,28 @@ XArea {
         anchors.horizontalCenter: r.horizontalCenter
         anchors.top: r.top
         anchors.topMargin: r.width*0.35
+        onOpacityChanged:{
+            //btnCameraRotation.text='Rotar '+apps.cameraRotation
+        }
         Behavior on opacity{NumberAnimation{duration: 500}}
+        Timer{
+            id: tSetBtnsCamera
+            running: rowBtnCamera.opacity!==0.0
+            repeat: true
+            interval: 500
+            onTriggered: {
+                //btnCameraRotation.text='Rotar '+apps.cameraRotation
+                if(apps.cameraRotation===0){
+                    btnCameraRotation.text='Rotar a 90°'
+                }else if(apps.cameraRotation===90){
+                    btnCameraRotation.text='Rotar a 180°'
+                }else if(apps.cameraRotation===180){
+                    btnCameraRotation.text='Rotar a 270°'
+                }else{
+                    btnCameraRotation.text='Sin Rotar'
+                }
+            }
+        }
         Timer{
             id: tHideBtnsCamera
             running: rowBtnCamera.opacity===1.0
@@ -271,10 +306,14 @@ XArea {
             enabled: rowBtnCamera.opacity===1.0
             anchors.horizontalCenter: r.horizontalCenter
             onClicked: {
+                flashVO.dur=0
+                flashVO.opacity=1.0
                 if(apps.cameraRotation===0){
                     apps.cameraRotation=90
                 }else if(apps.cameraRotation===90){
                     apps.cameraRotation=180
+                }else if(apps.cameraRotation===180){
+                    apps.cameraRotation=270
                 }else{
                     apps.cameraRotation=0
                 }
@@ -327,7 +366,7 @@ XArea {
             let porcRW=parseFloat(100-dw1/w1*100)
             let nh1=h1/100*porcRW
             //infoVO.text='RW:'+r.width+' WC:'+w1+' DW:'+dw1+' P1:'+porcRW+' HC:'+h1+' NH:'+nh1
-            if(apps.cameraRotation===90){
+            if(apps.cameraRotation===90||apps.cameraRotation===270){
                 xVO.width=nh1//+app.fs*2
                 xVO.height=r.width
             }else{
